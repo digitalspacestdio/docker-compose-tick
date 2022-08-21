@@ -45,8 +45,6 @@ services:
     env_file: .env.grafana
     networks:
       - 'tick'
-    ports:
-      - 3000:3000
     depends_on:
       influxdb:
         condition: service_healthy
@@ -75,8 +73,6 @@ services:
       - influxdb-var-lib-influxdb:/var/lib/influxdb
     networks:
       - 'tick'
-    ports:
-      - '127.0.0.1:8086:8086'
     env_file: .env.influx
     healthcheck:
       test: /bin/bash -c "</dev/tcp/localhost/8086"
