@@ -29,6 +29,9 @@ services:
         condition: service_healthy
     healthcheck:
       test: traefik healthcheck --ping
+      start_period: 5s
+      interval: 5s
+      retries: 30
     logging:
       driver: "json-file"
       options:
@@ -39,8 +42,7 @@ services:
     image: grafana/grafana-oss
     volumes:
       - grafana-var-lib-grafana:/var/lib/grafana
-    env_file:
-      - .env
+    env_file: .env.grafana
     networks:
       - 'tick'
     ports:
@@ -54,8 +56,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.entrypoints=web"
-      - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana/`)"
+      - "traefik.http.routers.grafana.rule=PathPrefix(`/grafana`)"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    healthcheck:
+      test: /bin/bash -c "</dev/tcp/localhost/3000"
+      start_period: 5s
+      interval: 5s
+      retries: 30
     logging:
       driver: "json-file"
       options:
@@ -63,15 +70,14 @@ services:
         max-file: "3"
 
   influxdb:
-    image: influxdb:2.2-alpine
+    image: influxdb:2.2
     volumes:
       - influxdb-var-lib-influxdb:/var/lib/influxdb
     networks:
       - 'tick'
     ports:
       - '127.0.0.1:8086:8086'
-    env_file:
-      - .env.influx
+    env_file: .env.influx
     healthcheck:
       test: /bin/bash -c "</dev/tcp/localhost/8086"
       start_period: 5s
@@ -91,8 +97,7 @@ services:
 
   mail:
     image: "namshi/smtp"
-    env_file:
-      - .env.mail
+    env_file: .env.mail
     environment:
       PORT: 1025
     networks:
@@ -115,4 +120,3 @@ volumes:
     driver: local
   influxdb-var-lib-influxdb:
     driver: local
-
