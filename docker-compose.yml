@@ -70,7 +70,7 @@ services:
   influxdb:
     image: influxdb:2.2
     volumes:
-      - influxdb-var-lib-influxdb:/var/lib/influxdb
+      - influxdb-var-lib-influxdb:/var/lib/influxdb2
     networks:
       - 'tick'
     env_file: .env.influx
